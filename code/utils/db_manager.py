@@ -41,7 +41,6 @@ def cep_loader(csv_file='../data/ceps_sem_localidades.csv', db_path='../data/cep
         # if len(cep) != 8, its not a valid cep
         if not len(str(cep)) == 8:
             continue
-
         try:
             address = get_address_from_cep(str(cep), webservice=WebService.CORREIOS)
             localidade = address['bairro']
@@ -49,21 +48,22 @@ def cep_loader(csv_file='../data/ceps_sem_localidades.csv', db_path='../data/cep
         except:
             localidade = 'Cep nao encontrado'
         print(f'Inserindo registro, CEP: {cep}, Localidade: {localidade}')
-        sql = ''' INSERT INTO Pareamento(cep, localidade) 
-                VALUES(?,?) '''
+        sql = '''INSERT INTO Pareamento(cep, localidade)
+                VALUES(?,?)'''
         cur.execute(sql, (np.int64(cep), localidade))
 
         conn.commit()
-        #Consulta para saber se os dados estão sendo salvos corretamente
-        '''
-        cur.execute("SELECT * FROM Pareamento WHERE cep= ?", (cep,))
-        data = cur.fetchone()
-        print(data)
-        '''
-    print(f'CEPs existentes no banco: {count_exists}\nCEPs adicionados: {count_news}')
+        # Consulta para saber se os dados estão sendo salvos corretamente
+
+        # cur.execute("SELECT * FROM Pareamento WHERE cep= ?", (cep,))
+        # data = cur.fetchone()
+        # print(data)
+        print(f'CEPs existentes no banco: {count_exists}\nCEPs adicionados: {count_news}')
+
 
 def join_db_with_csv(db_file='../data/cepsdb.db', csv_file='../bdo_csv/bdo_report_16-02-2021-16-55-00.csv'):
     """
+
 
     :param db_file: path to database file
     :param csv_file: path to csv file (report exported from BDO)
@@ -73,57 +73,58 @@ def join_db_with_csv(db_file='../data/cepsdb.db', csv_file='../bdo_csv/bdo_repor
     # Create your connection.
 
     conn = sqlite3.connect(db_file)
-    df_db = pd.read_sql_query("SELECT * FROM Pareamento", conn, index_col = ['cep'])
+    df_db = pd.read_sql_query("SELECT * FROM Pareamento", conn, index_col=['cep'])
 
-    df = pd.read_csv(csv_file,sep=';', parse_dates = ['Data_Alteraçao'])
+    df = pd.read_csv(csv_file, sep=';', parse_dates=['Data_Alteraçao'])
     pd.set_option('display.float_format', '{:.0f}'.format)
     df.fillna(0)
-    df['CEP'] = df['CEP'].astype(str) #cast to string to avoid typeError
-    df['CEP'] = df['CEP'].apply(lambda x: x.replace(' ',''))
+    df['CEP'] = df['CEP'].astype(str)  # cast to string to avoid typeError
+    df['CEP'] = df['CEP'].apply(lambda x: x.replace(' ', ''))
     df['CEP'] = df.CEP.apply(lambda x: x.split(','))
 
-    ceps_row = []
+
     nao_localizado = []
     for index, row in df.iterrows():
+        ceps_row = []
         for cep in row['CEP']:
             try:
-                ceps_row.append(df_db.loc[df_db.index==int(cep)].values[0][0])
+                ceps_row.append(df_db.loc[df_db.index == int(cep)].values[0][0])
             except:
                 nao_localizado.append(cep)
         df.at[index, 'Localidade DNE'] = ceps_row
 
     df = df[['Cod. Pareamento',
-     'Cod. UF',
-     'Sigla UF',
-     'Cod. Subarea',
-     'Nome Subarea',
-     'Cod. Municipio',
-     'Nome Municipio',
-     'Codigo Agencia',
-     'Nome Agencia',
-     'Cod. Setor',
-     'Cod. Logradouro CNEFE',
-     'Tipo Logradouro CNEFE',
-     'Titulo Logradouro CNEFE',
-     'Nome Logradouro CNEFE',
-     'Nome Tratado CNEFE',
-     'Tipo Logradouro DNE',
-     'Titulo Logradouro DNE',
-     'Nome Logradouro DNE',
-     'Nome Tratado DNE',
-     'Logradouro Completo DNE',
-     'Distancia',
-     'Cod. Match',
-     'Motivo Match',
-     'CEP',
-     'Localidade DNE',
-     'CEP Logradouro CNEFE',
-     'CEPs Face',
-     'Localidade Face',
-     'Alterar Logradouro para DNE?',
-     'Observaçao',
-     'SIAPE Alteração',
-     'Nome Alteraçao',
-     'Data_Alteraçao',
-     'Status']]
+             'Cod. UF',
+             'Sigla UF',
+             'Cod. Subarea',
+             'Nome Subarea',
+             'Cod. Municipio',
+             'Nome Municipio',
+             'Codigo Agencia',
+             'Nome Agencia',
+             'Cod. Setor',
+             'Cod. Logradouro CNEFE',
+             'Tipo Logradouro CNEFE',
+             'Titulo Logradouro CNEFE',
+             'Nome Logradouro CNEFE',
+             'Nome Tratado CNEFE',
+             'Tipo Logradouro DNE',
+             'Titulo Logradouro DNE',
+             'Nome Logradouro DNE',
+             'Nome Tratado DNE',
+             'Logradouro Completo DNE',
+             'Distancia',
+             'Cod. Match',
+             'Motivo Match',
+             'CEP',
+             'Localidade DNE',
+             'CEP Logradouro CNEFE',
+             'CEPs Face',
+             'Localidade Face',
+             'Alterar Logradouro para DNE?',
+             'Observaçao',
+             'SIAPE Alteração',
+             'Nome Alteraçao',
+             'Data_Alteraçao',
+             'Status']]
     return df, nao_localizado
