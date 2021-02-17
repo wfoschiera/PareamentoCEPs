@@ -2,7 +2,7 @@ import sqlite3
 import pandas as pd
 from pycep_correios import get_address_from_cep, WebService
 
-def cep_loader(csv_file='../Data/Ceps_sem_localidades.csv', db_path='../Data/cepsdb.db'):
+def cep_loader(csv_file='../data/ceps_sem_localidades.csv', db_path='../data/cepsdb.db'):
     '''
     function that verifies if a database already exists,
     if a table already exists on this db and, finally,
