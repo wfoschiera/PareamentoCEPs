@@ -1,0 +1,3 @@
+[flake8]
+max-line-length = 120
+exclude = .gitignore, bdo_csv, bkp, data, trash, .venv, .ipynb_checkpoints
