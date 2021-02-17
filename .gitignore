@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#my project ignoreds
+data/
+trash/
+bkp/
+.ipynb_checkpoints
+.idea
