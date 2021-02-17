@@ -133,3 +133,4 @@ data/
 trash/
 bkp/
 .ipynb_checkpoints
+.idea
