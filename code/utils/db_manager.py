@@ -32,7 +32,7 @@ def cep_loader(csv_file='../data/ceps_sem_localidades.csv', db_path='../data/cep
 
         try:
             data = cur.fetchone()[0]
-            #print("Found in database ", cur.fetchone())
+            print("Found in database ", data)
             count_exists += 1
             # continue jumps to next iteration if cep is found in db
             continue
@@ -71,6 +71,7 @@ def join_db_with_csv(db_file='../data/cepsdb.db', csv_file='../bdo_csv/bdo_repor
     """
 
     # Create your connection.
+
     conn = sqlite3.connect(db_file)
     df_db = pd.read_sql_query("SELECT * FROM Pareamento", conn, index_col = ['cep'])
 
